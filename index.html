@@ -2,207 +2,304 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Sinh Nhật Aurora 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aurora Birthday - Full Experience Edition</title>
     <style>
-        body { 
-            margin: 0; 
-            background: #000814; 
-            color: white; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            overflow: hidden; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            transition: 1.5s;
-        }
-
-        /* HIỆU ỨNG AURORA */
-        body.party-mode {
-            background: #000814;
-            position: relative;
-        }
-
-        body.party-mode::before, body.party-mode::after {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at center, rgba(0, 255, 136, 0.15), transparent 40%),
-                        radial-gradient(circle at 20% 30%, rgba(0, 183, 255, 0.2), transparent 40%),
-                        radial-gradient(circle at 80% 70%, rgba(183, 0, 255, 0.15), transparent 40%);
-            z-index: -1;
-            filter: blur(80px);
-            animation: auroraMove 15s infinite alternate ease-in-out;
-        }
-
-        @keyframes auroraMove {
-            0% { transform: rotate(0deg) scale(1); }
-            100% { transform: rotate(10deg) scale(1.1); }
-        }
-
-        /* Hộp quà */
-        .gift-container { position: relative; width: 180px; height: 180px; cursor: pointer; z-index: 100; }
-        .gift-box { width: 180px; height: 140px; background: #ff4757; border-radius: 0 0 10px 10px; position: absolute; bottom: 0; box-shadow: 0 0 30px rgba(255, 71, 87, 0.4); }
-        .gift-box::after { content: ''; position: absolute; width: 30px; height: 100%; background: #ffdd59; left: 50%; transform: translateX(-50%); }
-        .lid { width: 200px; height: 40px; background: #ff6b81; position: absolute; top: 0; left: -10px; border-radius: 5px; z-index: 2; transition: 0.7s cubic-bezier(0.5, -0.5, 0.2, 1.5); }
-        .lid::after { content: '🎁'; position: absolute; top: -50px; left: 50%; transform: translateX(-50%); font-size: 60px; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        .opened .lid { transform: translateY(-400px) rotate(45deg); opacity: 0; }
-        .opened .gift-box { transform: scale(0); opacity: 0; }
+        body { 
+            margin: 0; background: #000814; color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow: hidden; height: 100vh; width: 100vw;
+            display: flex; flex-direction: column; 
+            justify-content: center; align-items: center;
+        }
 
-        /* UI Sau khi mở */
-        #party-ui { display: none; text-align: center; width: 100%; animation: fadeInUp 1s forwards; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- 1. HIỆU ỨNG NỀN & VIỀN --- */
+        .corner-border {
+            position: fixed; width: 60px; height: 60px;
+            border: 3px solid transparent; z-index: 100;
+            pointer-events: none; transition: 1s; opacity: 0;
+        }
+        .top-left { top: 15px; left: 15px; border-top-color: #00f2fe; border-left-color: #00f2fe; border-radius: 8px 0 0 0; }
+        .top-right { top: 15px; right: 15px; border-top-color: #00f2fe; border-right-color: #00f2fe; border-radius: 0 8px 0 0; }
+        .bottom-left { bottom: 15px; left: 15px; border-bottom-color: #4facfe; border-left-color: #4facfe; border-radius: 0 0 0 8px; }
+        .bottom-right { bottom: 15px; right: 15px; border-bottom-color: #4facfe; border-right-color: #4facfe; border-radius: 0 0 8px 0; }
 
-        .horn-battle { display: flex; justify-content: space-around; width: 100%; max-width: 700px; margin: 0 auto; }
-        .horn { font-size: 120px; cursor: pointer; user-select: none; transition: 0.1s; filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.6)); }
-        #hornL { transform: scaleX(-1); }
-        .horn:active { transform: scale(1.3); }
+        .party-mode .corner-border { opacity: 1; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); animation: borderGlow 2s infinite alternate; }
+        @keyframes borderGlow { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(45deg); } }
 
+        .aurora-container { position: fixed; inset: 0; z-index: -1; background: #000814; overflow: hidden; }
+        .aurora-bg {
+            position: absolute; inset: -50%;
+            background: radial-gradient(circle at 20% 30%, rgba(0, 255, 136, 0.1), transparent 40%),
+                        radial-gradient(circle at 80% 70%, rgba(183, 0, 255, 0.1), transparent 40%);
+            filter: blur(60px); animation: auroraMove 15s infinite alternate ease-in-out; opacity: 0.6;
+        }
+        @keyframes auroraMove { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(5%, 5%) rotate(8deg); } }
+
+        /* --- 2. THANH NHẠC YOUTUBE & NÚT DỪNG/PHÁT --- */
+        .music-player {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 380px; padding: 15px;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 242, 254, 0.4); border-radius: 20px;
+            z-index: 2000; display: flex; flex-direction: column; gap: 10px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5); transition: 0.5s;
+        }
+        .music-player input {
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px; color: #fff; padding: 10px; font-size: 14px; outline: none; width: 100%;
+        }
+        .music-control { display: flex; gap: 10px; }
+        .music-player button {
+            flex: 1; border: none; border-radius: 12px; color: #000; font-weight: bold; 
+            padding: 12px; cursor: pointer; transition: 0.3s;
+        }
+        .music-player .btn-play { background: linear-gradient(45deg, #00f2fe, #4facfe); }
+        .music-player .btn-toggle { background: linear-gradient(45deg, #4facfe, #a29bfe); color: #fff; opacity: 0.5; cursor: not-allowed; }
+        .music-player .btn-toggle.active { opacity: 1; cursor: pointer; }
+        #music-status { font-size: 11px; color: #00f2fe; text-align: center; font-weight: bold; }
+
+        /* --- 3. HỘP QUÀ --- */
+        .gift-container { text-align: center; cursor: pointer; z-index: 100; position: relative; }
+        .gift-box { width: 140px; height: 110px; background: #ff4757; border-radius: 0 0 10px 10px; position: relative; margin: 50px auto 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .gift-box::after { content: ''; position: absolute; width: 25px; height: 100%; background: #ffdd59; left: 50%; transform: translateX(-50%); }
+        .lid { width: 160px; height: 35px; background: #ff6b81; position: absolute; top: -35px; left: -10px; border-radius: 5px; z-index: 10; }
+        .lid::before { content: '🎀'; position: absolute; top: -42px; left: 50%; transform: translateX(-50%); font-size: 45px; }
+
+        .opened .lid { transform: translateY(-300px) rotate(20deg); opacity: 0; transition: 0.8s; }
+        .opened .gift-box { transform: scale(0); opacity: 0; transition: 0.5s 0.2s; }
+
+        /* --- 4. GIAO DIỆN CHÍNH & CHỮ CHUYỂN ĐỘNG --- */
+        #party-ui { display: none; width: 100%; height: 100%; flex-direction: column; justify-content: space-around; align-items: center; padding: 20px; z-index: 10; }
+        .horn-battle { display: flex; justify-content: space-between; width: 90%; max-width: 450px; }
+        .horn { font-size: 70px; cursor: pointer; transition: 0.1s; filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.5)); }
+        #hornR { transform: scaleX(-1); }
+        .horn:active { transform: scale(1.2); }
+
+        /* HIỆU ỨNG CHỮ CHUYỂN ĐỘNG (Rainbow Lấp Lánh) */
         h1 { 
-            font-size: 3.8rem; 
-            margin: 25px 0;
-            background: linear-gradient(90deg, #00f2fe, #4facfe, #00f2fe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(79, 172, 254, 0.5);
-            font-weight: 800;
+            font-size: 2.5rem; text-align: center; font-weight: 800;
+            background: linear-gradient(to right, #00f2fe, #fff, #4facfe, #fff, #00f2fe);
+            background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-transform: uppercase; letter-spacing: 2px;
+            animation: rainbowGlow 4s linear infinite;
         }
 
-        .controls { display: flex; gap: 20px; justify-content: center; }
-        .btn { 
-            padding: 15px 35px; 
-            font-size: 20px; 
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 15px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            color: white; 
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            transition: 0.3s;
+        @keyframes rainbowGlow {
+            to { background-position: 200% center; }
         }
-        .btn:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .btn-cake { border-left: 4px solid #00f2fe; }
-        .btn-fire { border-left: 4px solid #4facfe; }
 
-        canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 50; }
+        .controls { display: flex; flex-direction: column; gap: 12px; width: 80%; max-width: 300px; }
+        .btn { padding: 16px; border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; color: white; background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:active { transform: scale(0.95); }
+
+        canvas { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+        #yt-player { display: none; }
     </style>
 </head>
 <body>
 
+    <div class="corner-border top-left"></div>
+    <div class="corner-border top-right"></div>
+    <div class="corner-border bottom-left"></div>
+    <div class="corner-border bottom-right"></div>
+
+    <div class="aurora-container"><div class="aurora-bg"></div></div>
+
+    <div id="yt-player"></div>
+
+    <div class="music-player" id="music-panel">
+        <input type="text" id="yt-link" placeholder="Dán link YouTube (Ví dụ: https://youtu.be/abcxyz)">
+        <div class="music-control">
+            <button onclick="loadMusic()" class="btn-play">PHÁT NHẠC NỀN 🎵</button>
+            <button onclick="toggleMusic()" class="btn-toggle" id="music-toggle-btn">DỪNG ⏸️</button>
+        </div>
+        <span id="music-status">Sẵn sàng phát nhạc</span>
+    </div>
+
     <div class="gift-container" id="gift" onclick="openGift()">
-        <div class="lid"></div>
-        <div class="gift-box"></div>
-        <p style="text-align: center; color: #00f2fe; margin-top: 190px; font-weight: bold; letter-spacing: 2px;">CHẠM ĐỂ BẮT ĐẦU CỰC QUANG ✨</p>
+        <div class="gift-box"><div class="lid"></div></div>
+        <p style="color: #00f2fe; margin-top: 25px; font-weight: bold; letter-spacing: 1px;">CHẠM ĐỂ MỞ QUÀ ✨</p>
     </div>
 
     <div id="party-ui">
         <div class="horn-battle">
-            <div class="horn" onclick="playHorn(event, 'left')">🎺</div>
+            <div class="horn" id="hornL" onclick="playHorn(event, 'left')">🎺</div>
             <div class="horn" id="hornR" onclick="playHorn(event, 'right')">🎺</div>
         </div>
-        
-        <h1>HAPPY BIRTHDAY!</h1>
-
+        <h1>Happy Birthday</h1>
         <div class="controls">
-            <button class="btn btn-cake" onclick="spawnEmoji('🎂')">BẮN BÁNH KEM 🎂</button>
-            <button class="btn btn-fire" onclick="multiFire()">BẮN PHÁO HOA ✨</button>
+            <button class="btn" onclick="spawnEmoji('🎂')">TẶNG BÁNH KEM 🎂</button>
+            <button class="btn" onclick="multiFire()">BẮN PHÁO HOA ✨</button>
         </div>
+        <div style="height: 120px;"></div>
     </div>
 
     <canvas id="canvas"></canvas>
 
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        let player;
+        let audioCtx = null;
+        let apiReady = false;
+        let isMusicPlaying = false;
+
+        // --- 1. Fix lỗi âm thanh còi ---
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playNote(f) {
+            initAudio();
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = 'sine'; o.frequency.value = f;
+            g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(); o.stop(audioCtx.currentTime + 0.5);
+        }
+
+        // --- 2. YouTube Logic (Full Feature: Play, Pause, Resume) ---
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('yt-player', {
+                height: '0', width: '0',
+                playerVars: { 'autoplay': 1, 'controls': 0 },
+                events: {
+                    'onReady': () => { apiReady = true; console.log("YT Ready") },
+                    'onError': () => { 
+                        document.body.style.cursor = 'default';
+                        document.getElementById('music-status').innerText = "❌ Lỗi YouTube!";
+                    }
+                }
+            });
+        }
+
+        function loadMusic() {
+            const linkInput = document.getElementById('yt-link');
+            const videoId = extractVideoID(linkInput.value);
+            const status = document.getElementById('music-status');
+            const toggleBtn = document.getElementById('music-toggle-btn');
+
+            if (videoId && apiReady) {
+                document.body.style.cursor = 'wait';
+                status.innerText = "⌛ Đang nạp nhạc...";
+                
+                player.loadVideoById(videoId);
+                player.mute(); // Lách luật autoplay
+                player.playVideo();
+                setTimeout(() => {
+                    player.unMute();
+                    player.setVolume(80);
+                    status.innerText = "🎵 Nhạc đã lên! ";
+                    toggleBtn.classList.add('active'); // Kích hoạt nút dừng
+                    toggleBtn.innerText = "DỪNG ⏸️";
+                    isMusicPlaying = true;
+                    document.body.style.cursor = 'default';
+                }, 2000);
+            } else { alert("Link YouTube không đúng hoặc API chưa sẵn sàng!"); }
+        }
+
+        // Hàm bật/dừng nhạc
+        function toggleMusic() {
+            const toggleBtn = document.getElementById('music-toggle-btn');
+            if (!player || !apiReady || !toggleBtn.classList.contains('active')) return;
+
+            if (isMusicPlaying) {
+                player.pauseVideo();
+                toggleBtn.innerText = "PHÁT ▶️";
+                isMusicPlaying = false;
+            } else {
+                player.playVideo();
+                toggleBtn.innerText = "DỪNG ⏸️";
+                isMusicPlaying = true;
+            }
+        }
+
+        function extractVideoID(url) {
+            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[7].length == 11) ? match[7] : null;
+        }
+
+        // --- 3. Hiệu ứng Canvas ---
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
 
         function openGift() {
+            initAudio();
             document.getElementById('gift').classList.add('opened');
             setTimeout(() => {
                 document.getElementById('gift').style.display = 'none';
                 document.body.classList.add('party-mode');
-                document.getElementById('party-ui').style.display = 'block';
-                multiFire();
+                document.getElementById('party-ui').style.display = 'flex';
+                // Bắn pháo hoa khởi động
+                for(let i=0; i<3; i++) setTimeout(multiFire, i * 400);
+                animate();
             }, 700);
-            animate();
-        }
-
-        function playNote(f) {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const o = audioCtx.createOscillator();
-                const g = audioCtx.createGain();
-                o.type = 'sine';
-                o.frequency.value = f;
-                g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1);
-                o.connect(g); g.connect(audioCtx.destination);
-                o.start(); o.stop(audioCtx.currentTime + 1);
-            } catch(e) {}
         }
 
         function playHorn(e, side) {
-            playNote(side === 'left' ? 440 : 660);
+            playNote(side === 'left' ? 440 : 554);
             const rect = e.target.getBoundingClientRect();
             const x = side === 'left' ? rect.right : rect.left;
-            for(let i=0; i<8; i++) particles.push(new Particle(x, rect.top + 60, null, '❄️', side));
+            for(let i=0; i<8; i++) particles.push(new Particle(x, rect.top + 35, null, '✨', side));
         }
 
         function spawnEmoji(e) {
-            for(let i=0; i<20; i++) particles.push(new Particle(window.innerWidth/2, window.innerHeight, null, e, 'up'));
+            for(let i=0; i<15; i++) particles.push(new Particle(canvas.width/2, canvas.height, null, e, 'up'));
         }
 
         function multiFire() {
-            const colors = ['#00f2fe', '#4facfe', '#7ed6df', '#ffffff', '#a29bfe'];
-            const rx = Math.random() * canvas.width;
-            const ry = Math.random() * (canvas.height/3);
-            for(let i=0; i<45; i++) particles.push(new Particle(rx, ry, colors[Math.floor(Math.random()*colors.length)], 'dot'));
+            const colors = ['#00f2fe', '#00ff88', '#b700ff', '#ffffff'];
+            const centerX = Math.random() * canvas.width;
+            const centerY = Math.random() * (canvas.height * 0.6);
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+            for(let i=0; i<45; i++) {
+                const angle = (Math.PI * 2 / 45) * i;
+                const speed = 2 + Math.random() * 5;
+                const vx = Math.cos(angle) * speed;
+                const vy = Math.sin(angle) * speed;
+                particles.push(new Particle(centerX, centerY, randomColor, 'dot', null, vx, vy));
+            }
         }
 
         class Particle {
-            constructor(x, y, color, type, dir) {
+            constructor(x, y, color, type, dir, vx, vy) {
                 this.x = x; this.y = y; this.color = color; this.type = type;
-                this.opacity = 1;
-                this.size = type === 'dot' ? 4 : 35;
-                if(dir === 'left') { this.vx = 7 + Math.random()*10; this.vy = (Math.random()-0.5)*12; }
-                else if(dir === 'right') { this.vx = -(7 + Math.random()*10); this.vy = (Math.random()-0.5)*12; }
-                else if(dir === 'up') { this.vx = (Math.random()-0.5)*8; this.vy = -(15 + Math.random()*10); }
-                else { this.vx = (Math.random()-0.5)*12; this.vy = (Math.random()-0.5)*12; }
-                this.gravity = 0.2;
+                this.opacity = 1; this.size = type === 'dot' ? Math.random() * 3 + 1 : 28;
+                if (vx !== undefined) { this.vx = vx; this.vy = vy; }
+                else {
+                    this.vx = (dir === 'left') ? 4+Math.random()*6 : (dir === 'right') ? -(4+Math.random()*6) : (Math.random()-0.5)*10;
+                    this.vy = (dir === 'up') ? -(10+Math.random()*12) : (Math.random()-0.5)*10;
+                }
             }
-            update() {
-                this.x += this.vx; this.y += this.vy; this.vy += this.gravity;
-                this.opacity -= 0.012;
-            }
+            update() { this.x += this.vx; this.y += this.vy; this.vy += 0.15; this.opacity -= 0.015; }
             draw() {
                 ctx.globalAlpha = this.opacity;
                 if(this.type === 'dot') {
-                    ctx.fillStyle = this.color;
-                    ctx.shadowBlur = 15; ctx.shadowColor = this.color;
-                    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
-                    ctx.shadowBlur = 0;
-                } else {
-                    ctx.font = `${this.size}px Arial`;
-                    ctx.fillText(this.type, this.x, this.y);
-                }
+                    ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+                } else { ctx.font = `${this.size}px Arial`; ctx.fillText(this.type, this.x, this.y); }
             }
         }
 
         function animate() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Stardust lấp lánh nhẹ
+            if(Math.random() > 0.9) particles.push(new Particle(Math.random()*canvas.width, canvas.height, '#ffffff', 'dot', 'up'));
             particles = particles.filter(p => p.opacity > 0);
-            particles.forEach(p => { p.update(); p.draw(); });
+            for(let p of particles) { p.update(); p.draw(); }
             requestAnimationFrame(animate);
         }
-
-        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
     </script>
 </body>
 </html>
