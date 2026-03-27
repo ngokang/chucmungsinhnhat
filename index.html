@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sinh Nhật Aurora 2026</title>
+    <style>
+        body { 
+            margin: 0; 
+            background: #000814; 
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow: hidden; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            transition: 1.5s;
+        }
+
+        /* HIỆU ỨNG AURORA */
+        body.party-mode {
+            background: #000814;
+            position: relative;
+        }
+
+        body.party-mode::before, body.party-mode::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(0, 255, 136, 0.15), transparent 40%),
+                        radial-gradient(circle at 20% 30%, rgba(0, 183, 255, 0.2), transparent 40%),
+                        radial-gradient(circle at 80% 70%, rgba(183, 0, 255, 0.15), transparent 40%);
+            z-index: -1;
+            filter: blur(80px);
+            animation: auroraMove 15s infinite alternate ease-in-out;
+        }
+
+        @keyframes auroraMove {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(10deg) scale(1.1); }
+        }
+
+        /* Hộp quà */
+        .gift-container { position: relative; width: 180px; height: 180px; cursor: pointer; z-index: 100; }
+        .gift-box { width: 180px; height: 140px; background: #ff4757; border-radius: 0 0 10px 10px; position: absolute; bottom: 0; box-shadow: 0 0 30px rgba(255, 71, 87, 0.4); }
+        .gift-box::after { content: ''; position: absolute; width: 30px; height: 100%; background: #ffdd59; left: 50%; transform: translateX(-50%); }
+        .lid { width: 200px; height: 40px; background: #ff6b81; position: absolute; top: 0; left: -10px; border-radius: 5px; z-index: 2; transition: 0.7s cubic-bezier(0.5, -0.5, 0.2, 1.5); }
+        .lid::after { content: '🎁'; position: absolute; top: -50px; left: 50%; transform: translateX(-50%); font-size: 60px; }
+        
+        .opened .lid { transform: translateY(-400px) rotate(45deg); opacity: 0; }
+        .opened .gift-box { transform: scale(0); opacity: 0; }
+
+        /* UI Sau khi mở */
+        #party-ui { display: none; text-align: center; width: 100%; animation: fadeInUp 1s forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .horn-battle { display: flex; justify-content: space-around; width: 100%; max-width: 700px; margin: 0 auto; }
+        .horn { font-size: 120px; cursor: pointer; user-select: none; transition: 0.1s; filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.6)); }
+        #hornL { transform: scaleX(-1); }
+        .horn:active { transform: scale(1.3); }
+
+        h1 { 
+            font-size: 3.8rem; 
+            margin: 25px 0;
+            background: linear-gradient(90deg, #00f2fe, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(79, 172, 254, 0.5);
+            font-weight: 800;
+        }
+
+        .controls { display: flex; gap: 20px; justify-content: center; }
+        .btn { 
+            padding: 15px 35px; 
+            font-size: 20px; 
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 15px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            color: white; 
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+        .btn:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .btn-cake { border-left: 4px solid #00f2fe; }
+        .btn-fire { border-left: 4px solid #4facfe; }
+
+        canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 50; }
+    </style>
+</head>
+<body>
+
+    <div class="gift-container" id="gift" onclick="openGift()">
+        <div class="lid"></div>
+        <div class="gift-box"></div>
+        <p style="text-align: center; color: #00f2fe; margin-top: 190px; font-weight: bold; letter-spacing: 2px;">CHẠM ĐỂ BẮT ĐẦU CỰC QUANG ✨</p>
+    </div>
+
+    <div id="party-ui">
+        <div class="horn-battle">
+            <div class="horn" onclick="playHorn(event, 'left')">🎺</div>
+            <div class="horn" id="hornR" onclick="playHorn(event, 'right')">🎺</div>
+        </div>
+        
+        <h1>HAPPY BIRTHDAY!</h1>
+
+        <div class="controls">
+            <button class="btn btn-cake" onclick="spawnEmoji('🎂')">BẮN BÁNH KEM 🎂</button>
+            <button class="btn btn-fire" onclick="multiFire()">BẮN PHÁO HOA ✨</button>
+        </div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        function openGift() {
+            document.getElementById('gift').classList.add('opened');
+            setTimeout(() => {
+                document.getElementById('gift').style.display = 'none';
+                document.body.classList.add('party-mode');
+                document.getElementById('party-ui').style.display = 'block';
+                multiFire();
+            }, 700);
+            animate();
+        }
+
+        function playNote(f) {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.type = 'sine';
+                o.frequency.value = f;
+                g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1);
+                o.connect(g); g.connect(audioCtx.destination);
+                o.start(); o.stop(audioCtx.currentTime + 1);
+            } catch(e) {}
+        }
+
+        function playHorn(e, side) {
+            playNote(side === 'left' ? 440 : 660);
+            const rect = e.target.getBoundingClientRect();
+            const x = side === 'left' ? rect.right : rect.left;
+            for(let i=0; i<8; i++) particles.push(new Particle(x, rect.top + 60, null, '❄️', side));
+        }
+
+        function spawnEmoji(e) {
+            for(let i=0; i<20; i++) particles.push(new Particle(window.innerWidth/2, window.innerHeight, null, e, 'up'));
+        }
+
+        function multiFire() {
+            const colors = ['#00f2fe', '#4facfe', '#7ed6df', '#ffffff', '#a29bfe'];
+            const rx = Math.random() * canvas.width;
+            const ry = Math.random() * (canvas.height/3);
+            for(let i=0; i<45; i++) particles.push(new Particle(rx, ry, colors[Math.floor(Math.random()*colors.length)], 'dot'));
+        }
+
+        class Particle {
+            constructor(x, y, color, type, dir) {
+                this.x = x; this.y = y; this.color = color; this.type = type;
+                this.opacity = 1;
+                this.size = type === 'dot' ? 4 : 35;
+                if(dir === 'left') { this.vx = 7 + Math.random()*10; this.vy = (Math.random()-0.5)*12; }
+                else if(dir === 'right') { this.vx = -(7 + Math.random()*10); this.vy = (Math.random()-0.5)*12; }
+                else if(dir === 'up') { this.vx = (Math.random()-0.5)*8; this.vy = -(15 + Math.random()*10); }
+                else { this.vx = (Math.random()-0.5)*12; this.vy = (Math.random()-0.5)*12; }
+                this.gravity = 0.2;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy; this.vy += this.gravity;
+                this.opacity -= 0.012;
+            }
+            draw() {
+                ctx.globalAlpha = this.opacity;
+                if(this.type === 'dot') {
+                    ctx.fillStyle = this.color;
+                    ctx.shadowBlur = 15; ctx.shadowColor = this.color;
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+                    ctx.shadowBlur = 0;
+                } else {
+                    ctx.font = `${this.size}px Arial`;
+                    ctx.fillText(this.type, this.x, this.y);
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            particles = particles.filter(p => p.opacity > 0);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+    </script>
+</body>
+</html>
